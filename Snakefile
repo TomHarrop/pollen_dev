@@ -48,7 +48,7 @@ sample_key = pandas.read_csv(sample_key_file)
 
 rule target:
     input:
-        expand('output/trim_clip/{stage}_{plant}.fq.gz',
+        expand('output/02_trim-clip/{stage}_{plant}.fq.gz',
                stage=['UNM', 'PUNM', 'BCP', 'TCP'],
                plant=['p1', 'p2', 'p3', 'p4'])
 

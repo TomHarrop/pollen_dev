@@ -60,7 +60,7 @@ rule trim_clip:
         adaptors = bbduk_adaptors,
         contaminants = bbduk_contaminants
     output:
-        r1 = 'output/trim_clip/{stage}_{plant}.fastq'
+        r1 = 'output/trim_clip/{stage}_{plant}.fq.gz'
     log:
         trim_log = 'output/logs/{stage}_{plant}_trim.log',
         trim_stats = 'output/trim_clip/{stage}_{plant}_trim-stats.txt',
@@ -87,6 +87,7 @@ rule trim_clip:
         'out={output.r1} '
         'ref={input.contaminants} '
         'k=31 hdist=1 stats={log.filter_stats} '
+        'ziplevel=9 '
         'minlength=50 '
         '2> {log.filter_log}'
 

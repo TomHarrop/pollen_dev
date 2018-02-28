@@ -60,12 +60,12 @@ rule trim_clip:
         adaptors = bbduk_adaptors,
         contaminants = bbduk_contaminants
     output:
-        r1 = 'output/trim_clip/{stage}_{plant}.fq.gz'
+        r1 = 'output/02_trim-clip/{stage}_{plant}.fq.gz'
     log:
-        trim_log = 'output/logs/{stage}_{plant}_trim.log',
-        trim_stats = 'output/trim_clip/{stage}_{plant}_trim-stats.txt',
-        filter_log = 'output/logs/{stage}_{plant}_filter.log',
-        filter_stats = 'output/trim_clip/{stage}_{plant}_filter-stats.txt'
+        trim_log = 'output/logs/02_trim-clip/{stage}_{plant}_trim.log',
+        trim_stats = 'output/02_trim-clip/{stage}_{plant}_trim-stats.txt',
+        filter_log = 'output/logs/02_trim-clip/{stage}_{plant}_filter.log',
+        filter_stats = 'output/02_trim-clip/{stage}_{plant}_filter-stats.txt'
     threads:
         10
     shell:

@@ -31,8 +31,8 @@ def resolve_path(my_path):
 
 sample_key_file = 'data/sample_key.csv'
 read_dir = 'data/fastq'
-bbduk_adaptors = 'venv/bin/resources/adapters.fa'
-bbduk_contaminants = 'venv/bin/resources/sequencing_artifacts.fa.gz'
+bbduk_adaptors = 'data/bbmap_resources/adapters.fa'
+bbduk_contaminants = 'data/bbmap_resources/sequencing_artifacts.fa.gz'
 star_reference_folder = 'output/010_ref/star_reference'
 
 #########

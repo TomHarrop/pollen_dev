@@ -48,7 +48,7 @@ sample_key = pandas.read_csv(sample_key_file)
 
 rule target:
     input:
-        expand('output/02_trim-clip/{stage}_{plant}.fq.gz',
+        expand('output/020_trim-clip/{stage}_{plant}.fq.gz',
                stage=['UNM', 'PUNM', 'BCP', 'TCP'],
                plant=['p1', 'p2', 'p3', 'p4'])
 
@@ -60,12 +60,12 @@ rule trim_clip:
         adaptors = bbduk_adaptors,
         contaminants = bbduk_contaminants
     output:
-        r1 = 'output/02_trim-clip/{stage}_{plant}.fq.gz'
+        r1 = 'output/020_trim-clip/{stage}_{plant}.fq.gz'
     log:
-        trim_log = 'output/logs/02_trim-clip/{stage}_{plant}_trim.log',
-        trim_stats = 'output/02_trim-clip/{stage}_{plant}_trim-stats.txt',
-        filter_log = 'output/logs/02_trim-clip/{stage}_{plant}_filter.log',
-        filter_stats = 'output/02_trim-clip/{stage}_{plant}_filter-stats.txt'
+        trim_log = 'output/logs/020_trim-clip/{stage}_{plant}_trim.log',
+        trim_stats = 'output/020_trim-clip/{stage}_{plant}_trim-stats.txt',
+        filter_log = 'output/logs/020_trim-clip/{stage}_{plant}_filter.log',
+        filter_stats = 'output/020_trim-clip/{stage}_{plant}_filter-stats.txt'
     threads:
         10
     shell:

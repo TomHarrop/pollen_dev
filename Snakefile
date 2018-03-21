@@ -52,11 +52,10 @@ rule target:
                 '{stage}_{plant}.Aligned.sortedByCoord.out.bam'),
                stage=['UNM', 'PUNM', 'BCP', 'TCP'],
                plant=['p1', 'p2', 'p3', 'p4']),
-        expand(('output/050_calculate-background/{region}/'
+        expand(('output/050_calculate-background/'
                 '{stage}_{plant}.csv'),
                stage=['UNM', 'PUNM', 'BCP', 'TCP'],
-               plant=['p1', 'p2', 'p3', 'p4'],
-               region=['genic', 'intergenic'])
+               plant=['p1', 'p2', 'p3', 'p4'])
 
 
 # 05. count reads per region
@@ -66,21 +65,11 @@ rule intergenic_reads:
                '{stage}_{plant}.Aligned.sortedByCoord.out.bam'),
         regions = 'output/040_shuffle/shuffled.bed'
     output:
-        counts = ('output/050_calculate-background/intergenic/'
+        counts = ('output/050_calculate-background/'
                   '{stage}_{plant}.csv')
-    threads:
-        1
-    script:
-        'src/count_reads_per_region.R'
-
-rule genic_reads:
-    input:
-        bam = ('output/030_star-pass2/'
-               '{stage}_{plant}.Aligned.sortedByCoord.out.bam'),
-        regions = 'output/040_shuffle/genes.bed'
-    output:
-        counts = ('output/050_calculate-background/genic/'
-                  '{stage}_{plant}.csv')
+    log:
+        log = ('output/logs/050_calculate-background/'
+               '{stage}-{plant}.log')
     threads:
         1
     script:

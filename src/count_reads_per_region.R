@@ -15,8 +15,8 @@ counts_file <- snakemake@output[["counts"]]
 log_file <- snakemake@log[["log"]]
 
 # dev
-# bamfile <- "output/030_star-pass2/TCP_p2.Aligned.sortedByCoord.out.bam"
-# regions_file <- "output/040_shuffle/shuffled.bed"
+bamfile <- "output/030_star-pass2/TCP_p2.Aligned.sortedByCoord.out.bam"
+regions_file <- "output/040_shuffle/shuffled.bed"
 
 ########
 # MAIN #
@@ -39,7 +39,7 @@ counts <- summarizeOverlaps(features = features,
                             mode = "Union",
                             singleEnd = FALSE,
                             ignore.strand = TRUE,
-                            fragments = FALSE)
+                            fragments = TRUE)
 
 # generate output
 output_data <- data.table(
@@ -54,3 +54,4 @@ fwrite(output_data, counts_file)
 
 # write session info
 sessionInfo()
+

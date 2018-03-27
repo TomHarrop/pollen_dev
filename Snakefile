@@ -48,14 +48,55 @@ sample_key = pandas.read_csv(sample_key_file)
 
 rule target:
     input:
-        expand(('output/030_star-pass2/'
-                '{stage}_{plant}.Aligned.sortedByCoord.out.bam'),
-               stage=['UNM', 'PUNM', 'BCP', 'TCP'],
-               plant=['p1', 'p2', 'p3', 'p4']),
-        expand(('output/050_calculate-background/'
-                '{stage}_{plant}.csv'),
-               stage=['UNM', 'PUNM', 'BCP', 'TCP'],
-               plant=['p1', 'p2', 'p3', 'p4'])
+        'output/070_tpm/tpm.csv',
+        'output/060_cutoffs/intergenic_tpm.csv'
+
+# 08 filter genes by expression
+
+
+# 07 calculate TPM
+rule calculate_tpm:
+    input:
+        count_files = expand(
+            ('output/030_star-pass2/{stage}_{plant}.ReadsPerGene.out.tab'),
+            stage=['UNM', 'PUNM', 'BCP', 'TCP'],
+            plant=['p1', 'p2', 'p3', 'p4']),
+        gtf = ('output/010_ref/'
+               'Araport11_GFF3_genes_transposons_nuc_norrna.201606.gtf')
+    params:
+        star_dir = 'output/030_star-pass2'
+    output:
+        tpm = 'output/070_tpm/tpm.csv'
+    threads:
+        1
+    log:
+        log = 'output/logs/070_tpm/tpm.log'
+    script:
+        'src/gene_tpm.R'
+
+# 06 calculate cutoffs
+rule calculate_cutoffs:
+    input:
+        bamfiles = expand(
+            ('output/030_star-pass2/'
+             '{stage}_{plant}.Aligned.sortedByCoord.out.bam'),
+            stage=['UNM', 'PUNM', 'BCP', 'TCP'],
+            plant=['p1', 'p2', 'p3', 'p4']),
+        bg_counts = expand(
+            ('output/050_calculate-background/'
+             '{stage}_{plant}.csv'),
+            stage=['UNM', 'PUNM', 'BCP', 'TCP'],
+            plant=['p1', 'p2', 'p3', 'p4'])
+    params:
+        star_dir = 'output/030_star-pass2'
+    output:
+        intergenic_tpm = 'output/060_cutoffs/intergenic_tpm.csv'
+    threads:
+        1
+    log:
+        log = 'output/logs/060_cutoffs/intergenic_tpm.log'
+    script:
+        'src/intergenic_tpm.R'
 
 
 # 05. count reads per region
@@ -63,7 +104,7 @@ rule intergenic_reads:
     input:
         bam = ('output/030_star-pass2/'
                '{stage}_{plant}.Aligned.sortedByCoord.out.bam'),
-        regions = 'output/040_shuffle/shuffled.bed'
+        regions = 'output/040_shuffle/shuffled.gff3'
     output:
         counts = ('output/050_calculate-background/'
                   '{stage}_{plant}.csv')
@@ -75,43 +116,21 @@ rule intergenic_reads:
     script:
         'src/count_reads_per_region.R'
 
-
 # 4. prepare shuffle reference
 rule shuffle:
     input:
-        genic = 'output/040_shuffle/genes.bed',
-        intergenic = 'output/040_shuffle/intergenic.bed',
-        seqlen = 'output/040_shuffle/seqlen.txt'
-    output:
-        'output/040_shuffle/shuffled.bed'
-    threads:
-        1
-    log:
-        'output/logs/040_shuffle/shuffle.log'
-    shell:
-        'bedtools shuffle '
-        '-incl {input.intergenic} '
-        '-noOverlapping '
-        '-seed 7 '
-        '-i {input.genic} '
-        '-g {input.seqlen} '
-        '> {output} '
-        '2> {log}'
-
-rule split_gffs:
-    input:
         gtf = ('output/010_ref/'
                'Araport11_GFF3_genes_transposons_nuc_norrna.201606.gtf'),
-        gff = 'data/ref/Araport11_GFF3_genes_transposons.201606.gff'
+        gff = 'data/ref/Araport11_GFF3_genes_transposons.201606.gff',
+        seqlengths = 'output/040_shuffle/seqlen.txt'
     output:
-        genic = 'output/040_shuffle/genes.bed',
-        intergenic = 'output/040_shuffle/intergenic.bed'
+        shuffled = 'output/040_shuffle/shuffled.gff3'
     threads:
         1
     log:
-        log = 'output/logs/040_shuffle/split_gffs.log'
+        log = 'output/logs/040_shuffle/shuffle_gtf.log'
     script:
-        'src/split_gtf.R'
+        'src/shuffle_gtf.R'
 
 rule calculate_seqlens:
     input:

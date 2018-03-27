@@ -15,8 +15,8 @@ counts_file <- snakemake@output[["counts"]]
 log_file <- snakemake@log[["log"]]
 
 # dev
-bamfile <- "output/030_star-pass2/TCP_p2.Aligned.sortedByCoord.out.bam"
-regions_file <- "output/040_shuffle/shuffled.bed"
+# bamfile <- "output/030_star-pass2/TCP_p2.Aligned.sortedByCoord.out.bam"
+# regions_file <- "test/shuffled_valr.gff3"
 
 ########
 # MAIN #
@@ -28,7 +28,7 @@ sink(log, type = "message")
 sink(log, append = TRUE, type = "output")
 
 # load regions
-features <- import.bed(regions_file)
+features <- import.gff3(regions_file)
 
 # load bamfile
 bam <- BamFile(bamfile)
@@ -45,7 +45,7 @@ counts <- summarizeOverlaps(features = features,
 output_data <- data.table(
     sample = gsub("^([^\\.]+).*", "\\1", basename(bamfile)),
     counts = assay(counts)[, 1],
-    id = rowData(counts)$name,
+    id = rowData(counts)$ID,
     feature_length = width(counts)
 )
 

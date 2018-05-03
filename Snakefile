@@ -48,10 +48,38 @@ sample_key = pandas.read_csv(sample_key_file)
 
 rule target:
     input:
-        'output/070_tpm/tpm.csv',
-        'output/060_cutoffs/intergenic_tpm.csv'
+        'output/090_deseq/dds.Rds'
+        
+# 09 DESeq analysis
+rule generate_deseq_object:
+    input:
+        gene_calls = 'output/080_filter-background/gene_calls.csv',
+        detected_genes = 'output/080_filter-background/detected_genes.csv'
+    output:
+        dds = 'output/090_deseq/dds.Rds'
+    threads:
+        1
+    log:
+        log = 'output/logs/090_deseq/generate_deseq_object.log'
+    script:
+        'src/generate_deseq_object.R'
 
 # 08 filter genes by expression
+rule filter_backgroud:
+    input:
+        tpm = 'output/070_tpm/tpm.csv',
+        intergenic_tpm = 'output/060_cutoffs/intergenic_tpm.csv'
+    output:
+        detected_genes = 'output/080_filter-background/detected_genes.csv',
+        gene_calls = 'output/080_filter-background/gene_calls.csv',
+        freqpoly = 'output/080_filter-background/cutoff_poly.pdf',
+        violin = 'output/080_filter-background/cutoff_violin.pdf'
+    log:
+        log = 'output/logs/080_filter-background/filter_genes.log'
+    threads:
+        1
+    script:
+        'src/filter_genes.R'
 
 
 # 07 calculate TPM

@@ -233,7 +233,7 @@ rule star_first_pass:
     output:
         sjdb = 'output/030_star-pass1/{stage}_{plant}.SJ.out.tab'
     threads:
-        1
+        32
     params:
         genome_dir = star_reference_folder,
         prefix = 'output/030_star-pass1/{stage}_{plant}.'

@@ -29,8 +29,8 @@ def resolve_path(my_path):
 # GLOBALS #
 ###########
 
-sample_key_file = 'data/sample_key.csv'
-read_dir = 'data/fastq'
+sample_key_file = 'data/sample_key2.csv'
+read_dir = 'data/fastq2'
 bbduk_adaptors = 'data/bbmap_resources/adapters.fa'
 bbduk_contaminants = 'data/bbmap_resources/sequencing_artifacts.fa.gz'
 star_reference_folder = 'output/010_ref/star_reference'
@@ -56,7 +56,7 @@ sample_key = pandas.read_csv(sample_key_file)
 rule target:
     input:
         'output/090_deseq/dds.Rds'
-        
+
 # 09 DESeq analysis
 rule generate_deseq_object:
     input:
@@ -99,7 +99,7 @@ rule calculate_tpm:
         count_files = expand(
             ('output/030_star-pass2/{stage}_{plant}.ReadsPerGene.out.tab'),
             stage=['UNM', 'PUNM', 'BCP', 'TCP'],
-            plant=['p1', 'p2', 'p3', 'p4']),
+            plant=['p5', 'p6', 'p7', 'p8']),
         gtf = ('output/010_ref/'
                'Araport11_GFF3_genes_transposons_nuc_norrna.201606.gtf')
     params:
@@ -122,12 +122,12 @@ rule calculate_cutoffs:
             ('output/030_star-pass2/'
              '{stage}_{plant}.Aligned.sortedByCoord.out.bam'),
             stage=['UNM', 'PUNM', 'BCP', 'TCP'],
-            plant=['p1', 'p2', 'p3', 'p4']),
+            plant=['p5', 'p6', 'p7', 'p8']),
         bg_counts = expand(
             ('output/050_calculate-background/'
              '{stage}_{plant}.csv'),
             stage=['UNM', 'PUNM', 'BCP', 'TCP'],
-            plant=['p1', 'p2', 'p3', 'p4'])
+            plant=['p5', 'p6', 'p7', 'p8']),
     params:
         star_dir = 'output/030_star-pass2'
     output:
@@ -199,13 +199,13 @@ rule star_second_pass:
         junctions = expand(
             'output/030_star-pass1/{stage}_{plant}.SJ.out.tab',
             stage=['UNM', 'PUNM', 'BCP', 'TCP'],
-            plant=['p1', 'p2', 'p3', 'p4'])
+            plant=['p5', 'p6', 'p7', 'p8']),
     output:
         bam = ('output/030_star-pass2/'
                '{stage}_{plant}.Aligned.sortedByCoord.out.bam'),
         counts = 'output/030_star-pass2/{stage}_{plant}.ReadsPerGene.out.tab'
     threads:
-        10
+        30
     params:
         genome_dir = star_reference_folder,
         prefix = 'output/030_star-pass2/{stage}_{plant}.'
@@ -234,7 +234,7 @@ rule star_first_pass:
     output:
         sjdb = 'output/030_star-pass1/{stage}_{plant}.SJ.out.tab'
     threads:
-        10
+        1
     params:
         genome_dir = star_reference_folder,
         prefix = 'output/030_star-pass1/{stage}_{plant}.'
@@ -267,7 +267,7 @@ rule trim_clip:
         filter_log = 'output/logs/020_trim-clip/{stage}_{plant}_filter.log',
         filter_stats = 'output/020_trim-clip/{stage}_{plant}_filter-stats.txt'
     threads:
-        10
+        1
     singularity:
         bbduk_container
     shell:

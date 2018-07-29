@@ -35,6 +35,13 @@ bbduk_adaptors = 'data/bbmap_resources/adapters.fa'
 bbduk_contaminants = 'data/bbmap_resources/sequencing_artifacts.fa.gz'
 star_reference_folder = 'output/010_ref/star_reference'
 
+# containers
+r_container = 'shub://TomHarrop/singularity-containers:r_3.5.0'
+star_container = 'shub://TomHarrop/singularity-containers:star_2.6.0c'
+bbduk_container = 'shub://TomHarrop/singularity-containers:bbmap_38.00'
+bio_container = ('shub://TomHarrop/singularity-containers:'
+                 'Singularity.biopython_1.72')
+
 #########
 # SETUP #
 #########
@@ -61,6 +68,8 @@ rule generate_deseq_object:
         1
     log:
         log = 'output/logs/090_deseq/generate_deseq_object.log'
+    singularity:
+        r_container
     script:
         'src/generate_deseq_object.R'
 
@@ -78,6 +87,8 @@ rule filter_backgroud:
         log = 'output/logs/080_filter-background/filter_genes.log'
     threads:
         1
+    singularity:
+        r_container
     script:
         'src/filter_genes.R'
 
@@ -99,6 +110,8 @@ rule calculate_tpm:
         1
     log:
         log = 'output/logs/070_tpm/tpm.log'
+    singularity:
+        r_container
     script:
         'src/gene_tpm.R'
 
@@ -123,6 +136,8 @@ rule calculate_cutoffs:
         1
     log:
         log = 'output/logs/060_cutoffs/intergenic_tpm.log'
+    singularity:
+        r_container
     script:
         'src/intergenic_tpm.R'
 
@@ -141,6 +156,8 @@ rule intergenic_reads:
                '{stage}-{plant}.log')
     threads:
         1
+    singularity:
+        r_container
     script:
         'src/count_reads_per_region.R'
 
@@ -157,6 +174,8 @@ rule shuffle:
         1
     log:
         log = 'output/logs/040_shuffle/shuffle_gtf.log'
+    singularity:
+        r_container
     script:
         'src/shuffle_gtf.R'
 
@@ -167,6 +186,8 @@ rule calculate_seqlens:
         seqlen = 'output/040_shuffle/seqlen.txt'
     threads:
         1
+    singularity:
+        bio_container
     script:
         'src/get_seqlength.py'
 
@@ -190,6 +211,8 @@ rule star_second_pass:
         prefix = 'output/030_star-pass2/{stage}_{plant}.'
     log:
         'output/logs/030_STAR-pass2_{stage}_{plant}.log'
+    singularity:
+        star_container
     shell:
         'STAR '
         '--runThreadN {threads} '
@@ -217,6 +240,8 @@ rule star_first_pass:
         prefix = 'output/030_star-pass1/{stage}_{plant}.'
     log:
         'output/logs/030_STAR-pass1_{stage}-{plant}.log'
+    singularity:
+        star_container
     shell:
         'STAR '
         '--runThreadN {threads} '
@@ -243,6 +268,8 @@ rule trim_clip:
         filter_stats = 'output/020_trim-clip/{stage}_{plant}_filter-stats.txt'
     threads:
         10
+    singularity:
+        bbduk_container
     shell:
         'bbduk.sh '
         'threads={threads} '
@@ -280,6 +307,8 @@ rule star_reference:
         30
     log:
         'output/logs/010_ref/star_reference.log'
+    singularity:
+        star_container
     shell:
         'STAR '
         '--runThreadN {threads} '
@@ -301,6 +330,8 @@ rule preprocess_gtf:
         1
     log:
         log = 'output/logs/010_ref/preprocess_gtf.log'
+    singularity:
+        r_container
     script:
         'src/preprocess_gtf.R'
 

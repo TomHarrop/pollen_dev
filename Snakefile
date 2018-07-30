@@ -39,7 +39,8 @@ star_reference_folder = 'output/010_ref/star_reference'
 r_container = 'shub://TomHarrop/singularity-containers:r_3.5.0'
 star_container = 'shub://TomHarrop/singularity-containers:star_2.6.0c'
 bbduk_container = 'shub://TomHarrop/singularity-containers:bbmap_38.00'
-bio_container = 'shub://TomHarrop/singularity-containers:biopython_1.72'
+biop_container = 'shub://TomHarrop/singularity-containers:biopython_1.72'
+bioc_container = 'shub://TomHarrop/singularity-containers:bioconductor_3.7'
 
 #########
 # SETUP #
@@ -68,7 +69,7 @@ rule generate_deseq_object:
     log:
         log = 'output/logs/090_deseq/generate_deseq_object.log'
     singularity:
-        r_container
+        bioc_container
     script:
         'src/generate_deseq_object.R'
 
@@ -110,7 +111,7 @@ rule calculate_tpm:
     log:
         log = 'output/logs/070_tpm/tpm.log'
     singularity:
-        r_container
+        bioc_container
     script:
         'src/gene_tpm.R'
 
@@ -156,7 +157,7 @@ rule intergenic_reads:
     threads:
         1
     singularity:
-        r_container
+        bioc_container
     script:
         'src/count_reads_per_region.R'
 
@@ -174,7 +175,7 @@ rule shuffle:
     log:
         log = 'output/logs/040_shuffle/shuffle_gtf.log'
     singularity:
-        r_container
+        bioc_container
     script:
         'src/shuffle_gtf.R'
 
@@ -186,7 +187,7 @@ rule calculate_seqlens:
     threads:
         1
     singularity:
-        bio_container
+        biop_container
     script:
         'src/get_seqlength.py'
 
@@ -330,7 +331,7 @@ rule preprocess_gtf:
     log:
         log = 'output/logs/010_ref/preprocess_gtf.log'
     singularity:
-        r_container
+        bioc_container
     script:
         'src/preprocess_gtf.R'
 

@@ -104,7 +104,7 @@ rule summarise_tpm:
     threads:
         1
     log:
-        'output/logs/070_tpm/summarise_tpm.log'
+        log = 'output/logs/070_tpm/summarise_tpm.log'
     singularity:
         r_container
     script:

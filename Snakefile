@@ -56,9 +56,26 @@ sample_key = pandas.read_csv(sample_key_file)
 rule target:
     input:
         'output/090_deseq/dds.Rds',
-        'output/070_tpm/tpm_summary.csv'
+        'output/070_tpm/tpm_summary.csv',
+        'output/090_deseq/pca.csv'
 
 # 09 DESeq analysis
+rule deseq_qc:
+    input:
+        dds = 'output/090_deseq/dds.Rds'
+    output:
+        pca_plot = 'output/090_deseq/pca_plot.pdf',
+        pca_dt = 'output/090_deseq/pca.csv',
+        distance_heatmap = 'output/090_deseq/distance_heatmap.pdf'
+    threads:
+        1
+    log:
+        log = 'output/logs/090_deseq/deseq_qc.log'
+    singularity:
+        bioc_container
+    script:
+        'src/deseq_qc.R'
+
 rule generate_deseq_object:
     input:
         gene_calls = 'output/080_filter-background/gene_calls.csv',

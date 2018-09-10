@@ -1,5 +1,9 @@
 #!/usr/bin/env Rscript
 
+log <- file(snakemake@log[["log"]], open = "wt")
+sink(log, type = "message")
+sink(log, append = TRUE, type = "output")
+
 library(data.table)
 library(ggplot2)
 
@@ -18,7 +22,6 @@ detected_genes_file <- snakemake@output[["detected_genes"]]
 gene_call_file <- snakemake@output[["gene_calls"]]
 gp1_file <- snakemake@output[["freqpoly"]]
 gp2_file <- snakemake@output[["violin"]]
-log_file <- snakemake@log[["log"]]
 
 # dev
 # tpm_file <- "output/070_tpm/tpm.csv"
@@ -33,11 +36,6 @@ log_file <- snakemake@log[["log"]]
 ########
 # MAIN #
 ########
-
-# set log
-log <- file(log_file, open = "wt")
-sink(log, type = "message")
-sink(log, append = TRUE, type = "output")
 
 # combine data
 intergenic_tpm <- fread(intergenic_tpm_file)
@@ -72,7 +70,7 @@ cutoffs[, plant := factor(plant, levels = sort(unique(plant)))]
 tpm_filter <- merge(tpm_data, cutoffs)
 tpm_filter[type == "Genes", detected_lib := tpm > q95]
 tpm_filter[type == "Genes",
-           detected_stage := sum(detected_lib, na.rm = TRUE) >= 3,
+           detected_stage := sum(detected_lib, na.rm = TRUE) >= 5,
            by = .(id, stage)]
 detected_genes <- tpm_filter[detected_stage == TRUE, unique(id)]
 

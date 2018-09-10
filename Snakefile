@@ -55,7 +55,8 @@ sample_key = pandas.read_csv(sample_key_file)
 
 rule target:
     input:
-        'output/090_deseq/dds.Rds'
+        'output/090_deseq/dds.Rds',
+        'output/070_tpm/tpm_summary.csv'
 
 # 09 DESeq analysis
 rule generate_deseq_object:
@@ -94,6 +95,21 @@ rule filter_backgroud:
 
 
 # 07 calculate TPM
+rule summarise_tpm:
+    input:
+        tpm = 'output/070_tpm/tpm.csv'
+    output:
+        tpm_wide = 'output/070_tpm/tpm_wide.csv',
+        tpm_summary = 'output/070_tpm/tpm_summary.csv'
+    threads:
+        1
+    log:
+        'output/logs/070_tpm/summarise_tpm.log'
+    singularity:
+        r_container
+    script:
+        'src/summarise_tpm.R'
+
 rule calculate_tpm:
     input:
         count_files = expand(

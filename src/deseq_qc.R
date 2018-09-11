@@ -19,12 +19,16 @@ pca_plot <- snakemake@output[["pca_plot"]]
 distance_heatmap <- snakemake@output[["distance_heatmap"]]
 pca_dt <- snakemake@output[["pca_dt"]]
 
+threads <- snakemake@threads[[1]]
+
 # dev
 # dds_file <- "output/090_deseq/dds.Rds"
 
 ########
 # MAIN #
 ########
+
+BiocParallel::register(BiocParallel::MulticoreParam(threads))
 
 # run the VST
 dds <- readRDS(dds_file)

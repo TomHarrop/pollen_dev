@@ -36,11 +36,16 @@ bbduk_contaminants = 'data/bbmap_resources/sequencing_artifacts.fa.gz'
 star_reference_folder = 'output/010_ref/star_reference'
 
 # containers
-r_container = 'shub://TomHarrop/singularity-containers:r_3.5.0'
-star_container = 'shub://TomHarrop/singularity-containers:star_2.6.0c'
-bbduk_container = 'shub://TomHarrop/singularity-containers:bbmap_38.00'
-biop_container = 'shub://TomHarrop/singularity-containers:biopython_1.72'
-bioc_container = 'shub://TomHarrop/singularity-containers:bioconductor_3.7'
+r_container = ('shub://TomHarrop/singularity-containers:r_3.5.0'
+               '@7322eba66379576b4a0a426070a5103d')
+star_container = ('shub://TomHarrop/singularity-containers:star_2.6.0c'
+                  '@eaa90a258fdb26b6b0ce7d07246ffe2c')
+bbduk_container = ('shub://TomHarrop/singularity-containers:bbmap_38.00'
+                   '@a773baa8cc025cc5b5cbee20e507fef7')
+biop_container = ('shub://TomHarrop/singularity-containers:biopython_1.72'
+                  '@eb4213531ecbfb44bc04028e2c3b1559')
+bioc_container = ('shub://TomHarrop/singularity-containers:bioconductor_3.7'
+                  '@2785c89cc4ef1cbb08c06dde9ecf9544')
 
 #########
 # SETUP #
@@ -57,9 +62,28 @@ rule target:
     input:
         'output/090_deseq/dds.Rds',
         'output/070_tpm/tpm_summary.csv',
-        'output/090_deseq/pca.csv'
+        'output/090_deseq/pca.csv',
+        'output/090_deseq/wald_stage.csv'
 
 # 09 DESeq analysis
+rule deseq_wald_tests:
+    input:
+        dds = 'output/090_deseq/dds.Rds'
+    output:
+        group_test = 'output/090_deseq/wald_BCP-TCP_vs_UNM-PUNM.csv',
+        stage_tests = 'output/090_deseq/wald_stage.csv'
+    params:
+        alpha = 0.1,
+        lfc_threshold = 0.5849625       # log(1.5, 2)
+    threads:
+        20
+    log:
+        log = 'output/logs/090_deseq/deseq_wald_tests.log'
+    singularity:
+        bioc_container
+    script:
+        'src/deseq_wald_tests.R'
+
 rule deseq_qc:
     input:
         dds = 'output/090_deseq/dds.Rds'
@@ -68,7 +92,7 @@ rule deseq_qc:
         pca_dt = 'output/090_deseq/pca.csv',
         distance_heatmap = 'output/090_deseq/distance_heatmap.pdf'
     threads:
-        1
+        20
     log:
         log = 'output/logs/090_deseq/deseq_qc.log'
     singularity:

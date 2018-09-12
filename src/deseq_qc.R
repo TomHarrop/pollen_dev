@@ -89,13 +89,11 @@ sample_dists <- dist(t(assay(vst)), method = "minkowski")
 # write the output
 fwrite(pc_dt, pca_dt)
 ggsave(pca_plot, gp, width = 10, height = 7.5, units = "in")
-
-cairo_pdf(distance_heatmap, width = 10, height = 7.5)
 pheatmap::pheatmap(as.matrix(sample_dists),
-                   clustering_distance_cols = sample_dists,
-                   clustering_distance_rows = sample_dists,
-                   col = colours)
-dev.off()
+                       clustering_distance_cols = sample_dists,
+                       clustering_distance_rows = sample_dists,
+                       col = colours,
+                       filename = distance_heatmap)
 
 # log
 sessionInfo()

@@ -63,7 +63,8 @@ rule target:
         'output/090_deseq/dds.Rds',
         'output/070_tpm/tpm_summary.csv',
         'output/090_deseq/pca.csv',
-        'output/090_deseq/wald_stage.csv'
+        'output/090_deseq/wald_stage.csv',
+        'output/050_calculate-background/featurecounts.csv'
 
 # 09 DESeq analysis
 rule deseq_wald_tests:
@@ -200,6 +201,25 @@ rule calculate_cutoffs:
 
 
 # 05. count reads per region
+rule feature_counts:
+    input:
+        bam_files = expand(
+            ('output/030_star-pass2/'
+             '{stage}_{plant}.Aligned.sortedByCoord.out.bam'),
+            stage=['UNM', 'PUNM', 'BCP', 'TCP'],
+            plant=['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8']),
+        gff = 'data/ref/Araport11_GFF3_genes_transposons.201606.gff'
+    output:
+        feature_counts = 'output/050_calculate-background/featurecounts.csv'
+    log:
+        log = 'output/logs/050_calculate-background/feature_counts.log'
+    threads:
+        50
+    singularity:
+        bioc_container
+    script:
+        'src/count_reads_per_feature.R'
+
 rule intergenic_reads:
     input:
         bam = ('output/030_star-pass2/'

@@ -45,7 +45,7 @@ bbduk_container = ('shub://TomHarrop/singularity-containers:bbmap_38.00'
 biop_container = ('shub://TomHarrop/singularity-containers:biopython_1.72'
                   '@eb4213531ecbfb44bc04028e2c3b1559')
 bioc_container = ('shub://TomHarrop/singularity-containers:bioconductor_3.7'
-                  '@2785c89cc4ef1cbb08c06dde9ecf9544')
+                  '@3af485369bd1c01d70a285eccb059f1aba2944ea')
 
 #########
 # SETUP #
@@ -65,7 +65,28 @@ rule target:
         'output/090_deseq/pca.csv',
         'output/090_deseq/wald_stage.csv',
         'output/050_calculate-background/featurecounts.csv',
-        'output/100_venn-diagrams/array_comparison.csv'
+        'output/100_venn-diagrams/array_comparison.csv',
+        'output/110_mfuzz/clusters.csv'
+
+# 11 cluster analysis
+rule mfuzz:
+    input:
+        dds = 'output/090_deseq/dds.Rds',
+        annotation = 'output/010_ref/araport_annotation.csv'
+    output:
+        cluster_plot = 'output/110_mfuzz/clusters.pdf',
+        annotated_clusters = 'output/110_mfuzz/clusters.csv'
+    params:
+        alpha = 0.1,
+        seed = 1
+    threads:
+        20
+    log:
+        'output/logs/110_mfuzz/mfuzz.log'
+    singularity:
+        bioc_container
+    script:
+        'src/mfuzz.R'
 
 # 10 set analysis
 rule venn_diagram:

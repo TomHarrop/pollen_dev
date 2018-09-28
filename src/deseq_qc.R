@@ -55,7 +55,7 @@ setnames(pc_dt, "rn", "sample_id")
 
 # plot the pca
 pc_dt[, c("stage", "plant") := tstrsplit(sample_id, "_")]
-stage_order <- c("UNM", "PUNM", "BCP", "TCP")
+stage_order <- c("RUNM", "PUNM", "LBCP", "LTCP")
 pc_dt[, stage := factor(stage, levels = stage_order)]
 pc_dt[, plant := factor(plant, levels = sort(unique(plant)))]
 

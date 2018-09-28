@@ -32,16 +32,20 @@ dds_file <- snakemake@input[["dds"]]
 
 group_dt_file <- snakemake@output[["group_test"]]
 pairwise_results_file <- snakemake@output[["stage_tests"]]
+de_matrix_file <- snakemake@output[["de_matrix"]]
 
 threads <- snakemake@threads[[1]]
 
 alpha <- snakemake@params[["alpha"]]
 lfcThreshold <- snakemake@params[["lfc_threshold"]]
 
+stage_order <- c("RUNM", "PUNM", "LBCP", "LTCP")
+
 # dev
 # dds_file <- "output/090_deseq/dds.Rds"
 # alpha <- 0.1
 # lfcThreshold <- log(1.5, 2)
+# threads <- 8
 
 ########
 # MAIN #
@@ -61,8 +65,8 @@ dds_subset$plant <- droplevels(dds_subset$plant)
 dds_group <- copy(dds_subset)
 dds_group$group <- factor(
     ifelse(as.character(dds_group$stage) %in%
-               c("UNM", "PUNM"), "UNM_PUNM", "BCP_TCP"),
-    levels = c("UNM_PUNM", "BCP_TCP"))
+               c("RUNM", "PUNM"), "RUNM_PUNM", "LBCP_LTCP"),
+    levels = c("RUNM_PUNM", "LBCP_LTCP"))
 design(dds_group) <-  ~ plant + group
 
 # run the wald tests
@@ -71,13 +75,13 @@ dds_group <- DESeq(dds_group, parallel = TRUE)
 
 # extract group results
 group_res <- results(dds_group,
-                     name = "group_BCP_TCP_vs_UNM_PUNM",
+                     name = "group_LBCP_LTCP_vs_RUNM_PUNM",
                      lfcThreshold = lfcThreshold,
                      alpha = alpha,
                      tidy = TRUE)
 group_dt <- data.table(group_res)
 setnames(group_dt, "row", "id")
-group_dt[, wald_test := "group_BCP_TCP_vs_UNM_PUNM"]
+group_dt[, wald_test := "group_LBCP_LTCP_vs_RUNM_PUNM"]
 
 # extract pairwise stage results
 combos <- combn(unique(as.character(dds_subset$stage)),
@@ -91,8 +95,31 @@ pairwise_results_list <- lapply(contrasts,
                                 dds = dds_subset)
 pairwise_results <- rbindlist(pairwise_results_list)
 
+# make pairwise comparison table
+n_de_table <- pairwise_results[padj < alpha,
+                               .(n_de = length(unique(id))),
+                               by = wald_test]
+n_de_table[, c("stage_1", "stage_2") := tstrsplit(wald_test, "_vs_")]
+n_de_table[, wald_test := NULL]
+
+all_comparisons <- rbind(rbind(data.table(
+    n_de = NA,
+    stage_1 = stage_order,
+    stage_2 = stage_order),
+    n_de_table[, .(n_de, stage_1 = stage_2, stage_2 = stage_1)]),
+    n_de_table)
+
+all_comparisons[, stage_1 := factor(stage_1, levels = stage_order)]
+all_comparisons[, stage_2 := factor(stage_2, levels = stage_order)]
+
+de_matrix <- as.matrix(
+    data.frame(
+        dcast(all_comparisons, stage_1 ~ stage_2, value.var = "n_de"),
+        row.names = "stage_1"))
+
 # write data
 fwrite(group_dt, group_dt_file)
 fwrite(pairwise_results, pairwise_results_file)
+write.csv(de_matrix, de_matrix_file, quote = FALSE)
 
-
+sessionInfo()

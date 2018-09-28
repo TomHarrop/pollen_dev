@@ -60,7 +60,7 @@ cutoffs[, c("stage", "plant") := tstrsplit(sample, "_"), by = sample]
 
 # rearrange plot
 tpm_data[, type := factor(type, levels = c("Intergenic", "Genes"))]
-stage_order <- c("UNM", "PUNM", "BCP", "TCP")
+stage_order <- c("RUNM", "PUNM", "LBCP", "LTCP")
 tpm_data[, stage := factor(stage, levels = stage_order)]
 tpm_data[, plant := factor(plant, levels = sort(unique(plant)))]
 cutoffs[, stage := factor(stage, levels = stage_order)]
@@ -70,7 +70,7 @@ cutoffs[, plant := factor(plant, levels = sort(unique(plant)))]
 tpm_filter <- merge(tpm_data, cutoffs)
 tpm_filter[type == "Genes", detected_lib := tpm > q95]
 tpm_filter[type == "Genes",
-           detected_stage := sum(detected_lib, na.rm = TRUE) >= 5,
+           detected_stage := sum(detected_lib, na.rm = TRUE) >= 4,
            by = .(id, stage)]
 detected_genes <- tpm_filter[detected_stage == TRUE, unique(id)]
 

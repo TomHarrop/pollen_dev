@@ -36,8 +36,8 @@ bbduk_contaminants = 'data/bbmap_resources/sequencing_artifacts.fa.gz'
 star_reference_folder = 'output/010_ref/star_reference'
 
 # containers
-r_container = ('shub://TomHarrop/singularity-containers:r_3.5.0'
-               '@7322eba66379576b4a0a426070a5103d')
+r_container = ('shub://TomHarrop/singularity-containers:r_3.5.1'
+               '@6fa6a4a5a2b6da669923db2a3b8a0bb3f876003c')
 star_container = ('shub://TomHarrop/singularity-containers:star_2.6.0c'
                   '@eaa90a258fdb26b6b0ce7d07246ffe2c')
 bbduk_container = ('shub://TomHarrop/singularity-containers:bbmap_38.00'
@@ -64,15 +64,37 @@ rule target:
         'output/070_tpm/tpm_summary.csv',
         'output/090_deseq/pca.csv',
         'output/090_deseq/wald_stage.csv',
-        'output/050_calculate-background/featurecounts.csv'
+        'output/050_calculate-background/featurecounts.csv',
+        'output/100_venn-diagrams/array_comparison.csv'
+
+# 10 set analysis
+rule venn_diagram:
+    input:
+        array = 'data/gb-2004-5-11-r85-s1.xls',
+        calls = 'output/080_filter-background/gene_calls.csv'
+    output:
+        venn_diagram = 'output/100_venn-diagrams/venn_diagram.pdf',
+        array_comparison = 'output/100_venn-diagrams/array_comparison.csv'
+    params:
+        outdir = 'output/100_venn-diagrams'
+    log:
+        'output/logs/100_venn/venn_diagram.log'
+    threads:
+        1
+    singularity:
+        r_container
+    script:
+        'src/venn_diagram.R'
+
 
 # 09 DESeq analysis
 rule deseq_wald_tests:
     input:
         dds = 'output/090_deseq/dds.Rds'
     output:
-        group_test = 'output/090_deseq/wald_BCP-TCP_vs_UNM-PUNM.csv',
-        stage_tests = 'output/090_deseq/wald_stage.csv'
+        group_test = 'output/090_deseq/wald_LBCP-LTCP_vs_RUNM-PUNM.csv',
+        stage_tests = 'output/090_deseq/wald_stage.csv',
+        de_matrix = 'output/090_deseq/number_of_de_genes.csv'
     params:
         alpha = 0.1,
         lfc_threshold = 0.5849625       # log(1.5, 2)
@@ -139,10 +161,11 @@ rule filter_backgroud:
 # 07 calculate TPM
 rule summarise_tpm:
     input:
-        tpm = 'output/070_tpm/tpm.csv'
+        tpm = 'output/080_filter-background/gene_calls.csv'
     output:
         tpm_wide = 'output/070_tpm/tpm_wide.csv',
-        tpm_summary = 'output/070_tpm/tpm_summary.csv'
+        tpm_summary = 'output/070_tpm/tpm_summary.csv',
+        tpm_summary_wide = 'output/070_tpm/tpm_summary_wide.csv'
     threads:
         1
     log:
@@ -156,7 +179,7 @@ rule calculate_tpm:
     input:
         count_files = expand(
             ('output/030_star-pass2/{stage}_{plant}.ReadsPerGene.out.tab'),
-            stage=['UNM', 'PUNM', 'BCP', 'TCP'],
+            stage=['RUNM', 'PUNM', 'LBCP', 'LTCP'],
             plant=['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8']),
         gtf = ('output/010_ref/'
                'Araport11_GFF3_genes_transposons_nuc_norrna.201606.gtf')
@@ -179,12 +202,12 @@ rule calculate_cutoffs:
         bamfiles = expand(
             ('output/030_star-pass2/'
              '{stage}_{plant}.Aligned.sortedByCoord.out.bam'),
-            stage=['UNM', 'PUNM', 'BCP', 'TCP'],
+            stage=['RUNM', 'PUNM', 'LBCP', 'LTCP'],
             plant=['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8']),
         bg_counts = expand(
             ('output/050_calculate-background/'
              '{stage}_{plant}.csv'),
-            stage=['UNM', 'PUNM', 'BCP', 'TCP'],
+            stage=['RUNM', 'PUNM', 'LBCP', 'LTCP'],
             plant=['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8']),
     params:
         star_dir = 'output/030_star-pass2'
@@ -206,7 +229,7 @@ rule feature_counts:
         bam_files = expand(
             ('output/030_star-pass2/'
              '{stage}_{plant}.Aligned.sortedByCoord.out.bam'),
-            stage=['UNM', 'PUNM', 'BCP', 'TCP'],
+            stage=['RUNM', 'PUNM', 'LBCP', 'LTCP'],
             plant=['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8']),
         gff = 'data/ref/Araport11_GFF3_genes_transposons.201606.gff'
     output:
@@ -275,7 +298,7 @@ rule star_second_pass:
         star_reference = 'output/010_ref/star_reference/Genome',
         junctions = expand(
             'output/030_star-pass1/{stage}_{plant}.SJ.out.tab',
-            stage=['UNM', 'PUNM', 'BCP', 'TCP'],
+            stage=['RUNM', 'PUNM', 'LBCP', 'LTCP'],
             plant=['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8']),
     output:
         bam = ('output/030_star-pass2/'
@@ -369,6 +392,22 @@ rule trim_clip:
         'ziplevel=9 '
         'minlength=50 '
         '2> {log.filter_log}'
+
+# parse annotations from araport GFF
+rule make_annotation_table:
+    input:
+        gff = 'data/ref/Araport11_GFF3_genes_transposons.201606.gff'
+    output:
+        annotation = 'output/010_ref/araport_annotation.csv'
+    threads:
+        1
+    log:
+        'output/logs/010_ref/make_annotation_table.log'
+    singularity:
+        bioc_container
+    script:
+        'src/make_annotation_table.R'
+
 
 # 01 prepare STAR reference
 rule star_reference:

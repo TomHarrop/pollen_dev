@@ -50,47 +50,6 @@ plot2_file <- snakemake@output[["intron_exon_plot"]]
 fc_file <- snakemake@output[["feature_counts"]]
 cpus <- snakemake@threads[[1]]
 
-
-#  cpus <- 6
-# gff_file = "data/ref/Araport11_GFF3_genes_transposons.201606.gff"
-# bamfile_list <- c("output/030_star-pass2/BCP_p1.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/BCP_p2.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/BCP_p3.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/BCP_p4.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/BCP_p5.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/BCP_p6.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/BCP_p7.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/BCP_p8.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/PUNM_p1.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/PUNM_p2.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/PUNM_p3.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/PUNM_p4.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/PUNM_p5.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/PUNM_p6.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/PUNM_p7.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/PUNM_p8.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/TCP_p1.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/TCP_p2.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/TCP_p3.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/TCP_p4.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/TCP_p5.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/TCP_p6.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/TCP_p7.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/TCP_p8.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/UNM_p1.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/UNM_p2.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/UNM_p3.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/UNM_p4.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/UNM_p5.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/UNM_p6.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/UNM_p7.Aligned.sortedByCoord.out.bam", 
-#                   "output/030_star-pass2/UNM_p8.Aligned.sortedByCoord.out.bam")
-# bamfile_list <- c("output/030_star-pass2/BCP_p5.Aligned.sortedByCoord.out.bam",
-#                   "output/030_star-pass2/BCP_p6.Aligned.sortedByCoord.out.bam")
-                  
-#  plot1_file <- "counts_per_category.pdf"
-#  plot2_file <- "intron_exon_counts.pdf"
-
 ########
 # MAIN #
 ########

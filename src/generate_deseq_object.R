@@ -33,7 +33,7 @@ count_dt <- dcast(det_calls, id ~ sample, value.var = "counts")
 count_matrix <- as.matrix(data.frame(count_dt, row.names = "id"))
 
 # generate col data
-stage_order <- c("UNM", "PUNM", "BCP", "TCP")
+stage_order <- c("RUNM", "PUNM", "LBCP", "LTCP")
 det_calls[, stage := factor(stage, levels = stage_order)]
 det_calls[, plant := factor(plant, levels = sort(unique(plant)))]
 cd <- data.frame(unique(det_calls[, .(sample, stage, plant)]),

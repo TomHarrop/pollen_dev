@@ -53,11 +53,15 @@ percent_exp <- pc$sdev^2/sum(pc$sdev^2) * 100
 pc_dt <- data.table(pc$x, keep.rownames = TRUE)
 setnames(pc_dt, "rn", "sample_id")
 
-# plot the pca
+# replace plant names with replicate names
 pc_dt[, c("stage", "plant") := tstrsplit(sample_id, "_")]
+rep_names <- c(p5 = 1, p6 = 2, p7 = 3, p8 = 4)
+pc_dt[, plant := plyr::revalue(plant, rep_names)]
+
+# plot the pca
 stage_order <- c("RUNM", "PUNM", "LBCP", "LTCP")
 pc_dt[, stage := factor(stage, levels = stage_order)]
-pc_dt[, plant := factor(plant, levels = sort(unique(plant)))]
+#pc_dt[, plant := factor(plant, levels = sort(unique(plant)))]
 
 pc_long <- melt(pc_dt,
                 id.vars = c("stage", "plant"),
@@ -73,8 +77,11 @@ lab_dt[, facet_label := paste0(component,
 pc_pd <- merge(pc_long, lab_dt)
 
 gp <- ggplot(pc_pd, aes(x = stage, y = value, colour = plant)) +
+    theme_minimal(base_size = 8) +
+    xlab(NULL) + ylab("Score") +
     facet_wrap(~ facet_label, nrow = 2) +
-    scale_colour_brewer(palette = "Set1") +
+    scale_colour_brewer(palette = "Set1",
+                        guide = guide_legend(title = "Replicate")) +
     geom_point(size = 2,
                alpha = 0.7,
                shape = 16,
@@ -88,7 +95,7 @@ sample_dists <- dist(t(assay(vst)), method = "minkowski")
 
 # write the output
 fwrite(pc_dt, pca_dt)
-ggsave(pca_plot, gp, width = 10, height = 7.5, units = "in")
+ggsave(pca_plot, gp, width = 150, height = 125, units = "mm")
 pheatmap::pheatmap(as.matrix(sample_dists),
                        clustering_distance_cols = sample_dists,
                        clustering_distance_rows = sample_dists,

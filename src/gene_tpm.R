@@ -23,7 +23,6 @@ star_dir <- snakemake@params[["star_dir"]]
 tpm_output <- snakemake@output[["tpm"]]
 log_file <- snakemake@log[["log"]]
 
-
 ########
 # MAIN #
 ########

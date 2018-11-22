@@ -66,7 +66,8 @@ rule target:
         'output/090_deseq/wald_stage.csv',
         'output/050_calculate-background/featurecounts.csv',
         'output/100_venn-diagrams/array_comparison.csv',
-        'output/110_mfuzz/clusters.csv'
+        'output/110_mfuzz/clusters.csv',
+        'output/090_deseq/runm_punm_cell_cyle.csv'
 
 # 11 cluster analysis
 rule mfuzz:
@@ -113,7 +114,7 @@ rule deseq_cell_cycle:
     input:
         stage_tests = 'output/090_deseq/wald_stage.csv',
         cycle_genes = 'output/010_ref/thalemine_cell_cycle.txt',
-        annot = '010_ref/araport_annotation.csv'
+        annot = 'output/010_ref/araport_annotation.csv'
     output:
         cycle_wald = 'output/090_deseq/runm_punm_cell_cyle.csv'
     threads:

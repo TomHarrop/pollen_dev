@@ -16,6 +16,11 @@ call_file <- snakemake@input[["calls"]]
 venn_diagram_file <- snakemake@output[["venn_diagram"]]
 array_comparison_file <- snakemake@output[["array_comparison"]]
 
+# dev
+array_file <- 'data/gb-2004-5-11-r85-s1.xls'
+call_file <- 'output/080_filter-background/gene_calls.csv'
+
+
 ########
 # MAIN #
 ########
@@ -51,6 +56,17 @@ intersect_list <- list(RUNM = pol_runm,
                        `Array\nBCP` = toupper(array_bcp),
                        `Array\nTCP` = toupper(array_tcp),
                        `RUNM &\nPUNM` = pol_runmpunm)
+
+# per gene "detected in" table
+all_genes <- unique(unlist(intersect_list))
+det_in_list <- lapply(all_genes, function(x)
+    lapply(intersect_list, function(y)
+        x %in% y))
+names(det_in_list) <- all_genes
+det_in <- rbindlist(det_in_list, idcol = "id")
+names(det_in) <- sub("\n", "_", names(det_in))
+names(det_in) <- sub(" ", "_", names(det_in))
+fwrite(det_in, det_in)
 
 # sapply(intersect_list, function(x) length(unique(x)))
 # length(unique(intersect(pol_runmpunm, toupper(array_unm))))

@@ -95,7 +95,8 @@ rule venn_diagram:
         calls = 'output/080_filter-background/gene_calls.csv'
     output:
         venn_diagram = 'output/100_venn-diagrams/venn_diagram.pdf',
-        array_comparison = 'output/100_venn-diagrams/array_comparison.csv'
+        array_comparison = 'output/100_venn-diagrams/array_comparison.csv',
+        detected_genes_matrix = 'output/100_venn-diagrams/detected_genes_matrix.csv'
     params:
         outdir = 'output/100_venn-diagrams'
     log:

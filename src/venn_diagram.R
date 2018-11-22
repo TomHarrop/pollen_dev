@@ -18,12 +18,6 @@ venn_diagram_file <- snakemake@output[["venn_diagram"]]
 array_comparison_file <- snakemake@output[["array_comparison"]]
 det_in_file <- snakemake@output[["detected_genes_matrix"]]
 
-# dev
-# array_file <- 'data/gb-2004-5-11-r85-s1.xls'
-# call_file <- 'output/080_filter-background/gene_calls.csv'
-# tapetum_file <- "~/Downloads/data sheet 1.xls"
-# venn_diagram_file <- "test.pdf"
-
 ########
 # MAIN #
 ########

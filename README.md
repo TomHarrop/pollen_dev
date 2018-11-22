@@ -31,3 +31,5 @@ The following files are not distributed with the workflow, and must be in a `dat
     + TAIR10_Chr.all.fasta from [https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_chromosome_files/TAIR10_chr_all.fasta](https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_chromosome_files/TAIR10_chr_all.fas)
 - Araport 11 annotation:
     + `Araport11_GFF3_genes_transposons.201606.gff` from [https://www.araport.org/downloads/Araport11_Release_201606/annotation](https://www.araport.org/downloads/Araport11_Release_201606/annotation)
+- Supplementary file `gb-2004-5-11-r85-s1.xls` from Honys and Twell, 2014 ([10.1186/gb-2004-5-11-r85](https://doi.org/10.1186/gb-2004-5-11-r85))
+- Supplementary file `data sheet 1.xls` from Li *et al*., 2017 ([10.3389/fpls.2017.01559](https://doi.org/10.3389/fpls.2017.01559))

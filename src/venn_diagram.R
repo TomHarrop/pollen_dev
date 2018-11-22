@@ -13,6 +13,7 @@ library(VennDiagram)
 
 array_file <- snakemake@input[["array"]]
 call_file <- snakemake@input[["calls"]]
+tapetum_file <- snakemake@input[["tapetum"]]
 venn_diagram_file <- snakemake@output[["venn_diagram"]]
 array_comparison_file <- snakemake@output[["array_comparison"]]
 det_in_file <- snakemake@output[["detected_genes_matrix"]]
@@ -20,7 +21,8 @@ det_in_file <- snakemake@output[["detected_genes_matrix"]]
 # dev
 # array_file <- 'data/gb-2004-5-11-r85-s1.xls'
 # call_file <- 'output/080_filter-background/gene_calls.csv'
-
+# tapetum_file <- "~/Downloads/data sheet 1.xls"
+# venn_diagram_file <- "test.pdf"
 
 ########
 # MAIN #
@@ -30,11 +32,20 @@ det_in_file <- snakemake@output[["detected_genes_matrix"]]
 array_data_tb <- read_xls(array_file)
 array_data <- as.data.table(array_data_tb)
 call_data <- fread(call_file)
+tapetum_data <- read_xls(tapetum_file,
+         sheet = 2,
+         skip = 5,
+         col_names = c("id", "tap8-10"))
+
 
 # list array genes
 array_unm <- array_data[UNM > 0, unique(`Gene Name`)]
 array_bcp <- array_data[BCP > 0, unique(`Gene Name`)]
 array_tcp <- array_data[TCP > 0, unique(`Gene Name`)]
+
+# list tapetum genes
+tapetum_genes <- unique(tapetum_data$id)
+tapetum_genes <- tapetum_genes[!is.na(tapetum_genes)]
 
 # list rna seq genes
 detected_stage <- dcast(unique(call_data, by = c("stage", "id", "detected_stage")),
@@ -56,7 +67,8 @@ intersect_list <- list(RUNM = pol_runm,
                        `Array\nUNM` = toupper(array_unm),
                        `Array\nBCP` = toupper(array_bcp),
                        `Array\nTCP` = toupper(array_tcp),
-                       `RUNM &\nPUNM` = pol_runmpunm)
+                       `RUNM &\nPUNM` = pol_runmpunm,
+                       Tapetum = tapetum_genes)
 
 # per gene "detected in" table
 all_genes <- unique(unlist(intersect_list))
@@ -137,8 +149,25 @@ vd3 <- venn.diagram(
     cat.fontfamily = 'Helvetica',
     alpha = 0.5,
     distance = 0.1)
+
 grid.draw(vd3)
 
+grid.newpage()
+
+vd4 <- venn.diagram(
+    intersect_list[c(1, 2, 9)],
+    fill = Set1[c(1:3)],
+    filename = NULL,
+    lty = "solid",
+    lwd = 1,
+    cex = 1,
+    cat.cex = 1,
+    fontfamily = 'Helvetica',
+    cat.fontfamily = 'Helvetica',
+    alpha = 0.5,
+    distance = 0.1)
+
+grid.draw(vd4)
 
 dev.off()
 

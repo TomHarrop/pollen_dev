@@ -93,6 +93,7 @@ rule mfuzz:
 rule venn_diagram:
     input:
         array = 'data/gb-2004-5-11-r85-s1.xls',
+        tapetum = 'data/data sheet 1.xls',
         calls = 'output/080_filter-background/gene_calls.csv'
     output:
         venn_diagram = 'output/100_venn-diagrams/venn_diagram.pdf',

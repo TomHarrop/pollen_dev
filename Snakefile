@@ -43,7 +43,7 @@ star_container = ('shub://TomHarrop/singularity-containers:star_2.6.0c'
 bbduk_container = ('shub://TomHarrop/singularity-containers:bbmap_38.00'
                    '@a773baa8cc025cc5b5cbee20e507fef7')
 biop_container = ('shub://TomHarrop/singularity-containers:biopython_1.72'
-                  '@eb4213531ecbfb44bc04028e2c3b1559')
+                  '@950b59af71aced8b0bcca297af4fef49')
 bioc_container = ('shub://TomHarrop/singularity-containers:bioconductor_3.7'
                   '@3af485369bd1c01d70a285eccb059f1aba2944ea')
 
@@ -108,8 +108,33 @@ rule venn_diagram:
     script:
         'src/venn_diagram.R'
 
-
 # 09 DESeq analysis
+rule deseq_cell_cycle:
+    input:
+        stage_tests = 'output/090_deseq/wald_stage.csv',
+        cycle_genes = 'output/010_ref/thalemine_cell_cycle.txt',
+        annot = '010_ref/araport_annotation.csv'
+    output:
+        cycle_wald = 'output/090_deseq/runm_punm_cell_cyle.csv'
+    threads:
+        1
+    log:
+        log = 'output/logs/090_deseq/deseq_cell_cycle.log'
+    singularity:
+        r_container
+    script:
+        'src/deseq_cell_cycle.R'
+
+rule thalemine_cell_cycle:
+    output:
+        cycle_genes = 'output/010_ref/thalemine_cell_cycle.txt'
+    threads:
+        1
+    singularity:
+        biop_container
+    script:
+        'src/get_cycle_genes.py'
+
 rule deseq_wald_tests:
     input:
         dds = 'output/090_deseq/dds.Rds'

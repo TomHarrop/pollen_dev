@@ -15,10 +15,11 @@ array_file <- snakemake@input[["array"]]
 call_file <- snakemake@input[["calls"]]
 venn_diagram_file <- snakemake@output[["venn_diagram"]]
 array_comparison_file <- snakemake@output[["array_comparison"]]
+det_in_file <- snakemake@output[["detected_genes_matrix"]]
 
 # dev
-array_file <- 'data/gb-2004-5-11-r85-s1.xls'
-call_file <- 'output/080_filter-background/gene_calls.csv'
+# array_file <- 'data/gb-2004-5-11-r85-s1.xls'
+# call_file <- 'output/080_filter-background/gene_calls.csv'
 
 
 ########
@@ -66,7 +67,7 @@ names(det_in_list) <- all_genes
 det_in <- rbindlist(det_in_list, idcol = "id")
 names(det_in) <- sub("\n", "_", names(det_in))
 names(det_in) <- sub(" ", "_", names(det_in))
-fwrite(det_in, det_in)
+fwrite(det_in, det_in_file)
 
 # sapply(intersect_list, function(x) length(unique(x)))
 # length(unique(intersect(pol_runmpunm, toupper(array_unm))))

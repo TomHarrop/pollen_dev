@@ -78,6 +78,7 @@ pc_pd <- merge(pc_long, lab_dt)
 
 gp <- ggplot(pc_pd, aes(x = stage, y = value, colour = plant)) +
     theme_minimal(base_size = 8) +
+    theme(panel.background = element_rect(colour = "black")) +
     xlab(NULL) + ylab("Score") +
     facet_wrap(~ facet_label, nrow = 2) +
     scale_colour_brewer(palette = "Set1",
@@ -86,7 +87,6 @@ gp <- ggplot(pc_pd, aes(x = stage, y = value, colour = plant)) +
                alpha = 0.7,
                shape = 16,
                position = position_jitter(width = 0.2))
-
 
 # plot a heatmap
 colours <- colorRampPalette(rev(RColorBrewer::brewer.pal(6, "Blues")))(255)
